@@ -33,25 +33,27 @@ func get_input():
 	# Clear vectors
 	self.motion = Vector2()
 	self.rayVec = Vector2()
-	#weaponArea.position = Vector2()
+	
+	if Input.is_action_pressed('player_right') || Input.is_action_pressed('player_left') || Input.is_action_pressed('player_down') || Input.is_action_pressed('player_up'):
+		weaponArea.position = Vector2()
 
 	# Movement inputs
 	if Input.is_action_pressed('player_right'):
 		self.motion.x += 1
 		self.rayVec.x += rayLength
-		weaponArea.position.x = rayLength
-	elif Input.is_action_pressed('player_left'):
+		weaponArea.position.x += rayLength
+	if Input.is_action_pressed('player_left'):
 		self.motion.x -= 1
 		self.rayVec.x -= rayLength
-		weaponArea.position.x = -1 * rayLength
+		weaponArea.position.x -= rayLength
 	if Input.is_action_pressed('player_down'):
 		self.motion.y += 1
 		self.rayVec.y += rayLength
-		weaponArea.position.y = rayLength
-	elif Input.is_action_pressed('player_up'):
+		weaponArea.position.y += rayLength
+	if Input.is_action_pressed('player_up'):
 		self.motion.y -= 1
 		self.rayVec.y -= rayLength
-		weaponArea.position.y = -1 * rayLength
+		weaponArea.position.y -= rayLength
 	
 	# Action inputs
 	if Input.is_action_just_pressed("player_action"):
