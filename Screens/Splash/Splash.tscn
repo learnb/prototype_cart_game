@@ -3,7 +3,7 @@
 [ext_resource path="res://Screens/Splash/Splash.gd" type="Script" id=1]
 [ext_resource path="res://Resources/Fonts/HelvetiPixel.ttf" type="DynamicFontData" id=2]
 
-[sub_resource type="Animation" id=2]
+[sub_resource type="Animation" id=1]
 resource_name = "Default"
 length = 2.0
 tracks/0/type = "value"
@@ -19,7 +19,7 @@ tracks/0/keys = {
 "values": [ 0.0, 1.0 ]
 }
 
-[sub_resource type="DynamicFont" id=1]
+[sub_resource type="DynamicFont" id=2]
 font_data = ExtResource( 2 )
 
 [node name="Intro" type="Node2D"]
@@ -31,7 +31,7 @@ one_shot = true
 autostart = true
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-anims/Default = SubResource( 2 )
+anims/Default = SubResource( 1 )
 
 [node name="Label" type="Label" parent="."]
 anchor_left = 0.5
@@ -41,7 +41,7 @@ margin_left = 112.0
 margin_top = 88.0
 margin_right = 208.0
 margin_bottom = 102.0
-custom_fonts/font = SubResource( 1 )
+custom_fonts/font = SubResource( 2 )
 text = "<Splash Screen>"
 align = 1
 valign = 1
