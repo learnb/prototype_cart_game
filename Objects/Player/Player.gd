@@ -21,7 +21,7 @@ var rayLength = 10
 var weaponHittingQueue = Array()
 
 func _ready():
-	pass
+	weaponArea.position = Vector2(rayLength, 0)
 
 func _physics_process(_delta):
 	get_input()
@@ -32,10 +32,11 @@ func get_input():
 
 	# Clear vectors
 	self.motion = Vector2()
-	self.rayVec = Vector2()
+	#self.rayVec = Vector2()
 	
 	if Input.is_action_pressed('player_right') || Input.is_action_pressed('player_left') || Input.is_action_pressed('player_down') || Input.is_action_pressed('player_up'):
 		weaponArea.position = Vector2()
+		self.rayVec = Vector2()
 
 	# Movement inputs
 	if Input.is_action_pressed('player_right'):
@@ -87,11 +88,11 @@ func check_collision():
 	# Detect hitting bodies with weapon
 	if self.state == PLAYER_STATES.ATTACK:
 		for b in weaponHittingQueue:
-			do_weapon_damage(b)
+			do_weapon_action(b)
 		weaponHittingQueue.empty()
 		self.state = PLAYER_STATES.IDLE
 
-func do_weapon_damage(body):
+func do_weapon_action(body):
 	if body.is_in_group("Enemy"):
 		print("hit Enemy")
 	if body.is_in_group("Cart"):
