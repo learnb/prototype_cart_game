@@ -100,7 +100,7 @@ func check_collision():
 			pass
 			#self.state = PLAYER_STATES.HOLDING
 		elif collider.is_in_group("Cart"):
-			pass
+			collider.pushed()
 			#self.state = PLAYER_STATES.PULLING
 	
 	# Detect hitting bodies with weapon

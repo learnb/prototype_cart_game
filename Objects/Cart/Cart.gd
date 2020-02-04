@@ -4,11 +4,13 @@ onready var Player = get_parent().get_node("Player")
 
 enum CART_STATES {
 	IDLE,
-	PULLED
+	PULLED,
+	PUSHED
 }
 
 var state: int = CART_STATES.IDLE
 var motion: Vector2 = Vector2()
+var pushMagnitude: int = 20
 var speed: int = 80
 var target: Vector2 = Vector2()
 var minDist: float = 30.0
@@ -44,35 +46,26 @@ func _physics_process(delta):
 			Player.release_cart(self)
 		else: # follow
 			ai_move_toward(target, delta)
+	elif self.state == CART_STATES.PUSHED:
+		react_to_push(target)
 
 func ai_sense_env():
-	if self.state == CART_STATES.PULLED:
-		self.target = Player.position
-	else:
-		pass
+	self.target = Player.position
 
 func ai_move_toward(_target, _delta):
 	# get vector to target
 	motion = _target - self.position
-	motion = motion.normalized()
-
-	# determine speed
-	if self.state == CART_STATES.PULLED:
-		motion *= speed
-#	if self.state == CART_STATES.PULLED:
-#		if weight == WEIGHTS.SMALL:
-#			motion *= (speed * WEIGHT_MODIFIER.SMALL)
-#		elif weight == WEIGHTS.MEDIUM:
-#			motion *= (speed * WEIGHT_MODIFIER.MEDIUM)
-#		elif weight == WEIGHTS.LARGE:
-#			motion *= (speed * WEIGHT_MODIFIER.LARGE)
-#	else:
-#		motion *= speed
+	motion = motion.normalized() * speed
 
 	# move
 	move_and_slide(motion)
 
-	# detect collision
+func react_to_push(_target):
+	motion = self.position - _target
+	motion = motion.normalized() * pushMagnitude
+	
+	move_and_slide(motion)
+	self.state = CART_STATES.IDLE
 
 # set to PULLED state
 func grabbed():
@@ -81,4 +74,9 @@ func grabbed():
 # set to IDLE state
 func released():
 	self.state = CART_STATES.IDLE
+
+# set to PUSHED state
+func pushed():
+	if self.state != CART_STATES.PULLED:
+		self.state = CART_STATES.PUSHED
 
