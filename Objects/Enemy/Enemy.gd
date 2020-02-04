@@ -90,3 +90,6 @@ func on_collide_player():
 	if self.state == ENEMY_STATES.HOLDING:
 		print("Enemy hit player")
 		self.state = ENEMY_STATES.IDLE
+
+func on_attacked_by_player():
+	self.call_deferred("queue_free")

@@ -11,6 +11,8 @@ var state: int = CART_STATES.IDLE
 var motion: Vector2 = Vector2()
 var speed: int = 80
 var target: Vector2 = Vector2()
+var minDist: float = 30.0
+var maxDist: float = 50.0
 
 # Weights for various part types
 enum WEIGHTS {
@@ -20,14 +22,14 @@ enum WEIGHTS {
 }
 
 # Assign weight value (larger part => slower movement)
-const WEIGHT_VALUE = {
+const WEIGHT_MODIFIER = {
 	SMALL = 0.6,
 	MEDIUM = 0.4,
 	LARGE = 0.2
 }
 
 # Store current weight
-var partType = self.WEIGHTS.SMALL
+var weight = self.WEIGHTS.LARGE
 
 
 func _ready():
@@ -36,7 +38,12 @@ func _ready():
 func _physics_process(delta):
 	ai_sense_env()
 	if self.state == CART_STATES.PULLED:
-		ai_move_toward(target, delta)
+		var d = self.position.distance_to(target)
+		if d > maxDist: # break free
+			self.released()
+			Player.release_cart(self)
+		else: # follow
+			ai_move_toward(target, delta)
 
 func ai_sense_env():
 	if self.state == CART_STATES.PULLED:
@@ -51,17 +58,27 @@ func ai_move_toward(_target, _delta):
 
 	# determine speed
 	if self.state == CART_STATES.PULLED:
-		if partType == WEIGHTS.SMALL:
-			motion *= (speed * WEIGHT_VALUE.SMALL)
-		elif partType == WEIGHTS.MEDIUM:
-			motion *= (speed * WEIGHT_VALUE.MEDIUM)
-		elif partType == WEIGHTS.LARGE:
-			motion *= (speed * WEIGHT_VALUE.LARGE)
-	else:
 		motion *= speed
+#	if self.state == CART_STATES.PULLED:
+#		if weight == WEIGHTS.SMALL:
+#			motion *= (speed * WEIGHT_MODIFIER.SMALL)
+#		elif weight == WEIGHTS.MEDIUM:
+#			motion *= (speed * WEIGHT_MODIFIER.MEDIUM)
+#		elif weight == WEIGHTS.LARGE:
+#			motion *= (speed * WEIGHT_MODIFIER.LARGE)
+#	else:
+#		motion *= speed
 
 	# move
 	move_and_slide(motion)
 
 	# detect collision
+
+# set to PULLED state
+func grabbed():
+	self.state = CART_STATES.PULLED
+
+# set to IDLE state
+func released():
+	self.state = CART_STATES.IDLE
 

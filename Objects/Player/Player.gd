@@ -17,6 +17,10 @@ enum PLAYER_ACTION_STATES {
 	HOLDING
 }
 
+const SPEED_MODIFIER = {
+	PULL = 0.5
+}
+
 var motion_state: int = PLAYER_MOTION_STATES.IDLE
 var action_state: int = PLAYER_ACTION_STATES.IDLE
 var motion: Vector2 = Vector2()
@@ -76,7 +80,7 @@ func get_input():
 	ray.set_cast_to(self.rayVec)
 	
 	if self.motion_state == PLAYER_MOTION_STATES.PULLING:
-		self.motion = self.motion.normalized() * (speed * 0.2)
+		self.motion = self.motion.normalized() * (speed * SPEED_MODIFIER.PULL)
 	else:
 		self.motion = self.motion.normalized() * speed
 		
@@ -98,28 +102,26 @@ func check_collision():
 		elif collider.is_in_group("Cart"):
 			pass
 			#self.state = PLAYER_STATES.PULLING
-		else:
-			print("Player hit something else")
-		#print(self.state)
 	
 	# Detect hitting bodies with weapon
 	if self.action_state == PLAYER_ACTION_STATES.ATTACK:
 		for b in weaponHittingQueue:
 			do_weapon_action(b)
 		weaponHittingQueue.empty()
-		if self.motion_state != PLAYER_MOTION_STATES.PULLING:
-			self.action_state = PLAYER_ACTION_STATES.IDLE
+		self.action_state = PLAYER_ACTION_STATES.IDLE
 	# Detect colliding bodies with grab/interact
 	elif self.action_state == PLAYER_ACTION_STATES.GRAB:
 		for b in interactAreaQueue:
 			do_grab_action(b)
 		interactAreaQueue.empty()
+		self.action_state = PLAYER_ACTION_STATES.IDLE
 
 func do_weapon_action(body):
 	if body.is_in_group("Enemy"):
 		# damage enemy
 		print("Player hit Enemy")
 		self.action_state = PLAYER_ACTION_STATES.IDLE
+		body.on_attacked_by_player()
 	if body.is_in_group("Cart"):
 		# repair cart
 		print("Player hit Cart")
@@ -128,14 +130,20 @@ func do_grab_action(body):
 	if body.is_in_group("Cart"):
 		if self.motion_state != PLAYER_MOTION_STATES.PULLING:
 			print("pull cart")
-			body.state = body.CART_STATES.PULLED
-			self.motion_state = PLAYER_MOTION_STATES.PULLING
-			self.action_state = PLAYER_ACTION_STATES.IDLE
+			self.pull_cart(body)
 		elif self.motion_state == PLAYER_MOTION_STATES.PULLING:
 			print("release cart")
-			body.state = body.CART_STATES.IDLE
-			self.motion_state = PLAYER_MOTION_STATES.IDLE
-			self.action_state = PLAYER_ACTION_STATES.IDLE
+			self.release_cart(body)
+
+func pull_cart(cart):
+	cart.grabbed()
+	self.motion_state = PLAYER_MOTION_STATES.PULLING
+	self.action_state = PLAYER_ACTION_STATES.IDLE
+
+func release_cart(cart):
+	cart.released()
+	self.motion_state = PLAYER_MOTION_STATES.IDLE
+	self.action_state = PLAYER_ACTION_STATES.IDLE
 
 func _on_Weapon_body_entered(body):
 	weaponHittingQueue.append(body)
