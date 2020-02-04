@@ -78,7 +78,7 @@ func ai_move_toward(_target, _delta):
 
 func on_collide_cart():
 	if self.state != ENEMY_STATES.HOLDING:
-		print("hit cart")
+		print("Enemy hit cart")
 		self.state = ENEMY_STATES.HOLDING
 		self.partType = WEIGHTS.MEDIUM
 		
@@ -88,5 +88,5 @@ func on_collide_cart():
 
 func on_collide_player():
 	if self.state == ENEMY_STATES.HOLDING:
-		print("hit player")
+		print("Enemy hit player")
 		self.state = ENEMY_STATES.IDLE

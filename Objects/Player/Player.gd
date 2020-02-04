@@ -6,6 +6,7 @@ onready var weaponArea = $WeaponArea
 enum PLAYER_MOTION_STATES {
 	IDLE,
 	WALK,
+	PULLING,
 	STUN
 }
 
@@ -13,8 +14,7 @@ enum PLAYER_ACTION_STATES {
 	IDLE,
 	ATTACK,
 	GRAB,
-	HOLDING,
-	PULLING
+	HOLDING
 }
 
 var motion_state: int = PLAYER_MOTION_STATES.IDLE
@@ -25,6 +25,7 @@ var rayVec: Vector2 = Vector2()
 var rayLength = 10
 
 var weaponHittingQueue = Array()
+var interactAreaQueue = Array()
 
 func _ready():
 	weaponArea.position = Vector2(rayLength, 0)
@@ -64,26 +65,25 @@ func get_input():
 	
 	# Action inputs
 	if Input.is_action_just_pressed("player_action"):
-		if self.action_state != PLAYER_ACTION_STATES.PULLING:
+		if self.motion_state != PLAYER_MOTION_STATES.PULLING:
 			self.action_state = PLAYER_ACTION_STATES.ATTACK
-		elif self.action_state == PLAYER_ACTION_STATES.PULLING:
-			self.action_state = PLAYER_ACTION_STATES.GRAB
-	if Input.is_action_just_released("player_action"):
-		if self.action_state != PLAYER_ACTION_STATES.PULLING:
-			self.action_state = PLAYER_ACTION_STATES.IDLE
+	
+	# Interact inputs
+	if Input.is_action_just_pressed("player_interact"):
+		self.action_state = PLAYER_ACTION_STATES.GRAB
 	
 	# Move
 	ray.set_cast_to(self.rayVec)
 	
-	if self.action_state == PLAYER_ACTION_STATES.PULLING:
+	if self.motion_state == PLAYER_MOTION_STATES.PULLING:
 		self.motion = self.motion.normalized() * (speed * 0.2)
 	else:
 		self.motion = self.motion.normalized() * speed
-	
-	if self.motion.x > 0 || self.motion.y > 0:
-		self.motion_state = PLAYER_MOTION_STATES.WALK
-	else:
-		self.motion_state = PLAYER_MOTION_STATES.IDLE
+		
+		if self.motion.x > 0 || self.motion.y > 0:
+			self.motion_state = PLAYER_MOTION_STATES.WALK
+		else:
+			self.motion_state = PLAYER_MOTION_STATES.IDLE
 
 func check_collision():
 	# Detect walking into bodies
@@ -107,31 +107,44 @@ func check_collision():
 		for b in weaponHittingQueue:
 			do_weapon_action(b)
 		weaponHittingQueue.empty()
-		if self.action_state != PLAYER_ACTION_STATES.PULLING:
+		if self.motion_state != PLAYER_MOTION_STATES.PULLING:
 			self.action_state = PLAYER_ACTION_STATES.IDLE
+	# Detect colliding bodies with grab/interact
 	elif self.action_state == PLAYER_ACTION_STATES.GRAB:
-		for b in weaponHittingQueue:
-			do_weapon_action(b)
-		weaponHittingQueue.empty()
+		for b in interactAreaQueue:
+			do_grab_action(b)
+		interactAreaQueue.empty()
 
 func do_weapon_action(body):
 	if body.is_in_group("Enemy"):
-		print("hit Enemy")
+		# damage enemy
+		print("Player hit Enemy")
+		self.action_state = PLAYER_ACTION_STATES.IDLE
 	if body.is_in_group("Cart"):
-		#if self.action_state != PLAYER_ACTION_STATES.PULLING:
-		if self.action_state == PLAYER_ACTION_STATES.ATTACK:
-			print(action_state)
+		# repair cart
+		print("Player hit Cart")
+
+func do_grab_action(body):
+	if body.is_in_group("Cart"):
+		if self.motion_state != PLAYER_MOTION_STATES.PULLING:
 			print("pull cart")
 			body.state = body.CART_STATES.PULLED
-			self.action_state = PLAYER_ACTION_STATES.PULLING
-		elif self.action_state == PLAYER_ACTION_STATES.GRAB:
+			self.motion_state = PLAYER_MOTION_STATES.PULLING
+			self.action_state = PLAYER_ACTION_STATES.IDLE
+		elif self.motion_state == PLAYER_MOTION_STATES.PULLING:
 			print("release cart")
 			body.state = body.CART_STATES.IDLE
+			self.motion_state = PLAYER_MOTION_STATES.IDLE
 			self.action_state = PLAYER_ACTION_STATES.IDLE
 
 func _on_Weapon_body_entered(body):
 	weaponHittingQueue.append(body)
 
-
 func _on_Weapon_body_exited(body):
 	weaponHittingQueue.remove(weaponHittingQueue.find(body))
+
+func _on_InteractArea_body_entered(body):
+	interactAreaQueue.append(body)
+
+func _on_InteractArea_body_exited(body):
+	interactAreaQueue.remove(interactAreaQueue.find(body))
