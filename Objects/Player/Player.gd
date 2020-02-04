@@ -3,16 +3,22 @@ extends KinematicBody2D
 onready var ray = $RayCast2D
 onready var weaponArea = $WeaponArea
 
-enum PLAYER_STATES {
+enum PLAYER_MOTION_STATES {
 	IDLE,
 	WALK,
-	ATTACK,
-	HOLDING,
-	PULLING,
 	STUN
 }
 
-var state: int = PLAYER_STATES.IDLE
+enum PLAYER_ACTION_STATES {
+	IDLE,
+	ATTACK,
+	GRAB,
+	HOLDING,
+	PULLING
+}
+
+var motion_state: int = PLAYER_MOTION_STATES.IDLE
+var action_state: int = PLAYER_ACTION_STATES.IDLE
 var motion: Vector2 = Vector2()
 var speed: int = 80
 var rayVec: Vector2 = Vector2()
@@ -58,45 +64,70 @@ func get_input():
 	
 	# Action inputs
 	if Input.is_action_just_pressed("player_action"):
-		self.state = PLAYER_STATES.ATTACK
+		if self.action_state != PLAYER_ACTION_STATES.PULLING:
+			self.action_state = PLAYER_ACTION_STATES.ATTACK
+		elif self.action_state == PLAYER_ACTION_STATES.PULLING:
+			self.action_state = PLAYER_ACTION_STATES.GRAB
 	if Input.is_action_just_released("player_action"):
-		self.state = PLAYER_STATES.IDLE
+		if self.action_state != PLAYER_ACTION_STATES.PULLING:
+			self.action_state = PLAYER_ACTION_STATES.IDLE
 	
+	# Move
 	ray.set_cast_to(self.rayVec)
-	self.motion = self.motion.normalized() * speed
 	
-	if self.state != PLAYER_STATES.ATTACK:
-		if self.motion.x > 0 || self.motion.y > 0:
-			self.state = PLAYER_STATES.WALK
-		else:
-			self.state = PLAYER_STATES.IDLE
+	if self.action_state == PLAYER_ACTION_STATES.PULLING:
+		self.motion = self.motion.normalized() * (speed * 0.2)
+	else:
+		self.motion = self.motion.normalized() * speed
+	
+	if self.motion.x > 0 || self.motion.y > 0:
+		self.motion_state = PLAYER_MOTION_STATES.WALK
+	else:
+		self.motion_state = PLAYER_MOTION_STATES.IDLE
 
 func check_collision():
 	# Detect walking into bodies
 	if ray.is_colliding():
 		var collider = ray.get_collider()
 		if collider.is_in_group("Enemy"):
-			self.state = PLAYER_STATES.STUN
+			pass
+			#self.state = PLAYER_STATES.STUN
 		elif collider.is_in_group("Pickup"):
-			self.state = PLAYER_STATES.HOLDING
+			pass
+			#self.state = PLAYER_STATES.HOLDING
 		elif collider.is_in_group("Cart"):
-			self.state = PLAYER_STATES.PULLING
+			pass
+			#self.state = PLAYER_STATES.PULLING
 		else:
 			print("Player hit something else")
 		#print(self.state)
 	
 	# Detect hitting bodies with weapon
-	if self.state == PLAYER_STATES.ATTACK:
+	if self.action_state == PLAYER_ACTION_STATES.ATTACK:
 		for b in weaponHittingQueue:
 			do_weapon_action(b)
 		weaponHittingQueue.empty()
-		self.state = PLAYER_STATES.IDLE
+		if self.action_state != PLAYER_ACTION_STATES.PULLING:
+			self.action_state = PLAYER_ACTION_STATES.IDLE
+	elif self.action_state == PLAYER_ACTION_STATES.GRAB:
+		for b in weaponHittingQueue:
+			do_weapon_action(b)
+		weaponHittingQueue.empty()
 
 func do_weapon_action(body):
 	if body.is_in_group("Enemy"):
 		print("hit Enemy")
 	if body.is_in_group("Cart"):
-		print("repair Cart")
+		#if self.action_state != PLAYER_ACTION_STATES.PULLING:
+		if self.action_state == PLAYER_ACTION_STATES.ATTACK:
+			print(action_state)
+			print("pull cart")
+			body.state = body.CART_STATES.PULLED
+			self.action_state = PLAYER_ACTION_STATES.PULLING
+		elif self.action_state == PLAYER_ACTION_STATES.GRAB:
+			print("release cart")
+			body.state = body.CART_STATES.IDLE
+			self.action_state = PLAYER_ACTION_STATES.IDLE
 
 func _on_Weapon_body_entered(body):
 	weaponHittingQueue.append(body)
