@@ -2,6 +2,8 @@ extends KinematicBody2D
 
 onready var ray = $RayCast2D
 onready var weaponArea = $WeaponArea
+onready var weaponSprite = $WeaponArea/Sprite
+onready var weaponSpriteTimer = $WeaponArea/Timer
 
 enum PLAYER_MOTION_STATES {
 	IDLE,
@@ -33,6 +35,8 @@ var interactAreaQueue = Array()
 
 func _ready():
 	weaponArea.position = Vector2(rayLength, 0)
+	weaponSprite.hide()
+	weaponSpriteTimer.wait_time = 0.2
 
 func _physics_process(_delta):
 	get_input()
@@ -70,11 +74,11 @@ func get_input():
 	# Action inputs
 	if Input.is_action_just_pressed("player_action"):
 		if self.motion_state != PLAYER_MOTION_STATES.PULLING:
-			self.action_state = PLAYER_ACTION_STATES.ATTACK
+			begin_attack()
 	
 	# Interact inputs
 	if Input.is_action_just_pressed("player_interact"):
-		self.action_state = PLAYER_ACTION_STATES.GRAB
+		begin_grab()
 	
 	# Move
 	ray.set_cast_to(self.rayVec)
@@ -97,10 +101,10 @@ func check_collision():
 			pass
 			#self.state = PLAYER_STATES.STUN
 		elif collider.is_in_group("Pickup"):
-			pass
+			collider.pushed(self)
 			#self.state = PLAYER_STATES.HOLDING
 		elif collider.is_in_group("Cart"):
-			collider.pushed()
+			collider.pushed(self)
 			#self.state = PLAYER_STATES.PULLING
 	
 	# Detect hitting bodies with weapon
@@ -108,19 +112,19 @@ func check_collision():
 		for b in weaponHittingQueue:
 			do_weapon_action(b)
 		weaponHittingQueue.empty()
-		self.action_state = PLAYER_ACTION_STATES.IDLE
+		end_attack()
 	# Detect colliding bodies with grab/interact
 	elif self.action_state == PLAYER_ACTION_STATES.GRAB:
 		for b in interactAreaQueue:
 			do_grab_action(b)
 		interactAreaQueue.empty()
-		self.action_state = PLAYER_ACTION_STATES.IDLE
+		end_grab()
 
 func do_weapon_action(body):
 	if body.is_in_group("Enemy"):
 		# damage enemy
 		print("Player hit Enemy")
-		self.action_state = PLAYER_ACTION_STATES.IDLE
+		#self.action_state = PLAYER_ACTION_STATES.IDLE
 		body.on_attacked_by_player()
 	if body.is_in_group("Cart"):
 		# repair cart
@@ -134,6 +138,20 @@ func do_grab_action(body):
 		elif self.motion_state == PLAYER_MOTION_STATES.PULLING:
 			print("release cart")
 			self.release_cart(body)
+
+func begin_attack():
+	self.action_state = PLAYER_ACTION_STATES.ATTACK
+	weaponSprite.call_deferred("show")
+
+func end_attack():
+	self.action_state = PLAYER_ACTION_STATES.IDLE
+	weaponSpriteTimer.start()
+
+func begin_grab():
+	self.action_state = PLAYER_ACTION_STATES.GRAB
+
+func end_grab():
+	self.action_state = PLAYER_ACTION_STATES.IDLE
 
 func pull_cart(cart):
 	cart.grabbed()
@@ -156,3 +174,7 @@ func _on_InteractArea_body_entered(body):
 
 func _on_InteractArea_body_exited(body):
 	interactAreaQueue.remove(interactAreaQueue.find(body))
+
+
+func _on_WeaponSpriteTimer_timeout():
+	weaponSprite.call_deferred("hide")

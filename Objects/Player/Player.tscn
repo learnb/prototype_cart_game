@@ -1,7 +1,8 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://Objects/Player/Player.gd" type="Script" id=1]
 [ext_resource path="res://Resources/Sprites/placeholder_accent1.png" type="Texture" id=2]
+[ext_resource path="res://Resources/Sprites/placeholder_light.png" type="Texture" id=3]
 
 [sub_resource type="CircleShape2D" id=1]
 radius = 9.0
@@ -33,11 +34,17 @@ shape = SubResource( 1 )
 [node name="CollisionShape2D" type="CollisionShape2D" parent="WeaponArea"]
 shape = SubResource( 2 )
 
+[node name="Sprite" type="Sprite" parent="WeaponArea"]
+texture = ExtResource( 3 )
+
+[node name="Timer" type="Timer" parent="WeaponArea"]
+
 [node name="InteractArea" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="InteractArea"]
 shape = SubResource( 3 )
 [connection signal="body_entered" from="WeaponArea" to="." method="_on_Weapon_body_entered"]
 [connection signal="body_exited" from="WeaponArea" to="." method="_on_Weapon_body_exited"]
+[connection signal="timeout" from="WeaponArea/Timer" to="." method="_on_WeaponSpriteTimer_timeout"]
 [connection signal="body_entered" from="InteractArea" to="." method="_on_InteractArea_body_entered"]
 [connection signal="body_exited" from="InteractArea" to="." method="_on_InteractArea_body_exited"]

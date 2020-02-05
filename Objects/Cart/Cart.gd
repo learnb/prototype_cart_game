@@ -77,7 +77,7 @@ func released():
 	self.state = CART_STATES.IDLE
 
 # set to PUSHED state
-func pushed():
+func pushed(_body):
 	if self.state != CART_STATES.PULLED:
 		self.state = CART_STATES.PUSHED
 
