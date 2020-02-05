@@ -61,6 +61,10 @@ func ai_move_toward(_target, _delta):
 	# move
 	move_and_slide(motion)
 
+func on_attacked_by_player():
+	# get repaired
+	print("Player hit Cart")
+
 func react_to_push(_target):
 	motion = self.position - _target
 	motion = motion.normalized() * pushMagnitude

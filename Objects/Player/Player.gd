@@ -31,6 +31,7 @@ var rayVec: Vector2 = Vector2()
 var rayLength = 10
 
 var weaponHittingQueue = Array()
+var weaponHitQueue = Array()
 var interactAreaQueue = Array()
 
 func _ready():
@@ -39,6 +40,7 @@ func _ready():
 	weaponTimer.wait_time = 0.2
 
 func _physics_process(_delta):
+	#print(weaponHitQueue.size())
 	get_input()
 	move_and_slide(self.motion)
 	check_collision()
@@ -110,25 +112,26 @@ func check_collision():
 	# Detect hitting bodies with weapon
 	if self.action_state == PLAYER_ACTION_STATES.ATTACK:
 		for b in weaponHittingQueue:
-			do_weapon_action(b)
-		weaponHittingQueue.empty()
+			if not (b in weaponHitQueue):
+			#if true:
+				do_weapon_action(b)
+				weaponHitQueue.append(b)
+		#weaponHittingQueue.clear()
 		#end_attack()
 	# Detect colliding bodies with grab/interact
 	elif self.action_state == PLAYER_ACTION_STATES.GRAB:
 		for b in interactAreaQueue:
 			do_grab_action(b)
-		interactAreaQueue.empty()
+		#interactAreaQueue.clear()
 		end_grab()
 
 func do_weapon_action(body):
 	if body.is_in_group("Enemy"):
 		# damage enemy
-		print("Player hit Enemy")
-		#self.action_state = PLAYER_ACTION_STATES.IDLE
 		body.on_attacked_by_player()
 	if body.is_in_group("Cart"):
 		# repair cart
-		print("Player hit Cart")
+		body.on_attacked_by_player()
 
 func do_grab_action(body):
 	if body.is_in_group("Cart"):
@@ -147,6 +150,7 @@ func begin_attack():
 func end_attack():
 	self.action_state = PLAYER_ACTION_STATES.IDLE
 	weaponSprite.call_deferred("hide")
+	weaponHitQueue.clear()
 
 func begin_grab():
 	self.action_state = PLAYER_ACTION_STATES.GRAB
