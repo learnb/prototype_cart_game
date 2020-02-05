@@ -11,10 +11,10 @@ enum CART_STATES {
 var state: int = CART_STATES.IDLE
 var motion: Vector2 = Vector2()
 var pushMagnitude: int = 20
-var speed: int = 80
+var speed: int = 40
 var target: Vector2 = Vector2()
-var minDist: float = 30.0
-var maxDist: float = 50.0
+var minDist: float = 10.0
+var maxDist: float = 30.0
 
 # Weights for various part types
 enum WEIGHTS {
@@ -45,7 +45,8 @@ func _physics_process(delta):
 			self.released()
 			Player.release_cart(self)
 		else: # follow
-			ai_move_toward(target, delta)
+			if d > minDist:
+				ai_move_toward(target, delta)
 	elif self.state == CART_STATES.PUSHED:
 		react_to_push(target)
 
