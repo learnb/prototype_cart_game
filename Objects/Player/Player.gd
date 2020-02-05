@@ -3,7 +3,7 @@ extends KinematicBody2D
 onready var ray = $RayCast2D
 onready var weaponArea = $WeaponArea
 onready var weaponSprite = $WeaponArea/Sprite
-onready var weaponSpriteTimer = $WeaponArea/Timer
+onready var weaponTimer = $WeaponArea/Timer
 
 enum PLAYER_MOTION_STATES {
 	IDLE,
@@ -36,7 +36,7 @@ var interactAreaQueue = Array()
 func _ready():
 	weaponArea.position = Vector2(rayLength, 0)
 	weaponSprite.hide()
-	weaponSpriteTimer.wait_time = 0.2
+	weaponTimer.wait_time = 0.2
 
 func _physics_process(_delta):
 	get_input()
@@ -112,7 +112,7 @@ func check_collision():
 		for b in weaponHittingQueue:
 			do_weapon_action(b)
 		weaponHittingQueue.empty()
-		end_attack()
+		#end_attack()
 	# Detect colliding bodies with grab/interact
 	elif self.action_state == PLAYER_ACTION_STATES.GRAB:
 		for b in interactAreaQueue:
@@ -142,10 +142,11 @@ func do_grab_action(body):
 func begin_attack():
 	self.action_state = PLAYER_ACTION_STATES.ATTACK
 	weaponSprite.call_deferred("show")
+	weaponTimer.start()
 
 func end_attack():
 	self.action_state = PLAYER_ACTION_STATES.IDLE
-	weaponSpriteTimer.start()
+	weaponSprite.call_deferred("hide")
 
 func begin_grab():
 	self.action_state = PLAYER_ACTION_STATES.GRAB
@@ -175,6 +176,5 @@ func _on_InteractArea_body_entered(body):
 func _on_InteractArea_body_exited(body):
 	interactAreaQueue.remove(interactAreaQueue.find(body))
 
-
-func _on_WeaponSpriteTimer_timeout():
-	weaponSprite.call_deferred("hide")
+func _on_WeaponTimer_timeout():
+	end_attack()

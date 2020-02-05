@@ -45,6 +45,6 @@ texture = ExtResource( 3 )
 shape = SubResource( 3 )
 [connection signal="body_entered" from="WeaponArea" to="." method="_on_Weapon_body_entered"]
 [connection signal="body_exited" from="WeaponArea" to="." method="_on_Weapon_body_exited"]
-[connection signal="timeout" from="WeaponArea/Timer" to="." method="_on_WeaponSpriteTimer_timeout"]
+[connection signal="timeout" from="WeaponArea/Timer" to="." method="_on_WeaponTimer_timeout"]
 [connection signal="body_entered" from="InteractArea" to="." method="_on_InteractArea_body_entered"]
 [connection signal="body_exited" from="InteractArea" to="." method="_on_InteractArea_body_exited"]
