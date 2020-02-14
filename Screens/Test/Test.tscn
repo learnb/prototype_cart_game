@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://Screens/Test/Test.gd" type="Script" id=1]
 [ext_resource path="res://Objects/Level/Level.tscn" type="PackedScene" id=2]
@@ -6,6 +6,7 @@
 [ext_resource path="res://Objects/Enemy/Enemy.tscn" type="PackedScene" id=4]
 [ext_resource path="res://Objects/Cart/Cart.tscn" type="PackedScene" id=5]
 [ext_resource path="res://Objects/Collectibles/Part/Part.tscn" type="PackedScene" id=6]
+[ext_resource path="res://Objects/Barrier/Barrier.tscn" type="PackedScene" id=7]
 
 [node name="Test" type="Node2D"]
 script = ExtResource( 1 )
@@ -16,10 +17,115 @@ script = ExtResource( 1 )
 position = Vector2( 72, 56 )
 
 [node name="Enemy" parent="." instance=ExtResource( 4 )]
-position = Vector2( 176, 112 )
+position = Vector2( 256, -88 )
+
+[node name="Enemy2" parent="." instance=ExtResource( 4 )]
+position = Vector2( 440, 0 )
+
+[node name="Enemy3" parent="." instance=ExtResource( 4 )]
+position = Vector2( 152, -248 )
+
+[node name="Enemy4" parent="." instance=ExtResource( 4 )]
+position = Vector2( 40, -232 )
+
+[node name="Enemy5" parent="." instance=ExtResource( 4 )]
+position = Vector2( -296, 56 )
+
+[node name="Enemy6" parent="." instance=ExtResource( 4 )]
+position = Vector2( -296, 152 )
+
+[node name="Enemy7" parent="." instance=ExtResource( 4 )]
+position = Vector2( -296, 104 )
 
 [node name="Cart" parent="." instance=ExtResource( 5 )]
 position = Vector2( 32, 24 )
 
 [node name="Pickup" parent="." instance=ExtResource( 6 )]
 position = Vector2( 120, 16 )
+
+[node name="Pickup2" parent="." instance=ExtResource( 6 )]
+position = Vector2( 360, 248 )
+
+[node name="Pickup3" parent="." instance=ExtResource( 6 )]
+position = Vector2( 368, 232 )
+
+[node name="Pickup4" parent="." instance=ExtResource( 6 )]
+position = Vector2( 384, 240 )
+
+[node name="Pickup5" parent="." instance=ExtResource( 6 )]
+position = Vector2( 376, 208 )
+
+[node name="Pickup6" parent="." instance=ExtResource( 6 )]
+position = Vector2( -232, -320 )
+
+[node name="Pickup7" parent="." instance=ExtResource( 6 )]
+position = Vector2( 288, 256 )
+
+[node name="Pickup8" parent="." instance=ExtResource( 6 )]
+position = Vector2( 96, -8 )
+
+[node name="Barrier" parent="." instance=ExtResource( 7 )]
+position = Vector2( 168, 72 )
+
+[node name="Barrier2" parent="." instance=ExtResource( 7 )]
+position = Vector2( 168, 40 )
+
+[node name="Barrier3" parent="." instance=ExtResource( 7 )]
+position = Vector2( 168, 56 )
+
+[node name="Barrier4" parent="." instance=ExtResource( 7 )]
+position = Vector2( 24, -168 )
+
+[node name="Barrier5" parent="." instance=ExtResource( 7 )]
+position = Vector2( 24, -184 )
+
+[node name="Barrier6" parent="." instance=ExtResource( 7 )]
+position = Vector2( 24, -200 )
+
+[node name="Barrier7" parent="." instance=ExtResource( 7 )]
+position = Vector2( 24, -216 )
+
+[node name="Barrier8" parent="." instance=ExtResource( 7 )]
+position = Vector2( 8, -200 )
+
+[node name="Barrier9" parent="." instance=ExtResource( 7 )]
+position = Vector2( 8, -184 )
+
+[node name="Barrier10" parent="." instance=ExtResource( 7 )]
+position = Vector2( 8, -168 )
+
+[node name="Barrier11" parent="." instance=ExtResource( 7 )]
+position = Vector2( 8, -152 )
+
+[node name="Barrier12" parent="." instance=ExtResource( 7 )]
+position = Vector2( -264, 104 )
+
+[node name="Barrier13" parent="." instance=ExtResource( 7 )]
+position = Vector2( -280, 120 )
+
+[node name="Barrier14" parent="." instance=ExtResource( 7 )]
+position = Vector2( -280, 104 )
+
+[node name="Barrier15" parent="." instance=ExtResource( 7 )]
+position = Vector2( -280, 88 )
+
+[node name="Barrier16" parent="." instance=ExtResource( 7 )]
+position = Vector2( -280, 72 )
+
+[node name="Barrier17" parent="." instance=ExtResource( 7 )]
+position = Vector2( -280, 56 )
+
+[node name="Barrier18" parent="." instance=ExtResource( 7 )]
+position = Vector2( -280, 40 )
+
+[node name="Barrier19" parent="." instance=ExtResource( 7 )]
+position = Vector2( -264, 88 )
+
+[node name="Barrier20" parent="." instance=ExtResource( 7 )]
+position = Vector2( -264, 72 )
+
+[node name="Barrier21" parent="." instance=ExtResource( 7 )]
+position = Vector2( -264, 56 )
+
+[node name="Barrier22" parent="." instance=ExtResource( 7 )]
+position = Vector2( -264, 40 )

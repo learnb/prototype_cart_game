@@ -132,6 +132,9 @@ func do_weapon_action(body):
 	if body.is_in_group("Cart"):
 		# repair cart
 		body.on_attacked_by_player()
+	if body.is_in_group("Barrier"):
+		# damage barrier
+		body.on_attacked_by_player()
 
 func do_grab_action(body):
 	if body.is_in_group("Cart"):
