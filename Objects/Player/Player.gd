@@ -20,7 +20,7 @@ enum PLAYER_ACTION_STATES {
 }
 
 const SPEED_MODIFIER = {
-	PULL = 0.5
+	PULL = 0.3
 }
 
 var motion_state: int = PLAYER_MOTION_STATES.IDLE
